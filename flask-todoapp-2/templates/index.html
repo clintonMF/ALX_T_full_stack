@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        .hidden{
+            display:none;
+        }
+    </style>        
+    <title>todoapp</title>
+</head>
+<body>
+    <form id="form">
+        <label for="todo">Add todo</label>
+        <input type="text" id="description" name="description">
+        <input type="submit" value="Create">
+    </form>
+    <div class = "hidden" id = "error"> Something went wrong! </div>
+    <ul id="todos">
+        {%for d in data%}
+        <li class="">{{d.description}}</li>
+        {%endfor%}
+    </ul>
+    <script>
+        document.getElementById('form').onsubmit = function(e){
+            e.preventDefault();//this line of code is to select on the form
+            // and prevent the default behaviour. because of this we are able 
+            // to remove the method and actions from the form as we won't need
+            // them. we would send the form asynchroniously using fetch.
+            fetch('/todos/create',{
+                method: 'POST',
+                body: JSON.stringify({
+                    'description':document.getElementById('description').value
+                }),
+                headers: {
+                    'content-Type':'application/json'
+                }
+            })
+            .then(function(response) {
+                return response.json();
+            })
+            .then(function(jsonResponse) {
+                console.log(jsonResponse);
+                const liItem = document.createElement('LI');
+                liItem.innerHTML = jsonResponse['description'];
+                document.getElementById('todos').appendChild(liItem);
+                document.getElementById('error').className= 'hidden';
+            })
+            .catch(function() {
+                document.getElementById('error').className = '';
+            })
+        }
+    </script>
+</body>
+</html>
