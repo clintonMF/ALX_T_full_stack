@@ -1,8 +1,11 @@
-from flask import Flask, jsonify,render_template, request, redirect ,url_for,jsonify,abort
+from email.policy import default
+from flask import Flask, jsonify,render_template, request,jsonify,abort
 from flask_sqlalchemy import SQLAlchemy
 from dotenv import load_dotenv
 import os
 import sys
+from flask_migrate import Migrate
+from sqlalchemy import false
 
 load_dotenv()
 
@@ -12,17 +15,18 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("database_details")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
-
+migrate = Migrate(app, db)
 
 class Todo(db.Model):
     __tablename__ = "todos1"
     id = db.Column(db.Integer, primary_key=True)
     description = db.Column(db.String(), nullable=False)
+    completed = db.Column(db.Boolean,nullable=False,default=False)
     
     def __repr__(self):
         return f"<Todo id:{self.id} description:{self.description}>"
     
-db.create_all()
+
 
 @app.route('/')
 def index():
